@@ -8,15 +8,14 @@ exports.onWriteTrigger = functions.firestore
   .onWrite(async (change, context) => {
     const docId = context.params.docId;
     const userUid = context.auth ? context.auth.uid : null;
-    const params = context.params;
     const beforeData = change.before.data();
     const afterData = change.after.data();
 
     await admin.firestore().collection("logs").add({
-      docId,
-      userUid,
-      beforeData,
-      afterData,
+      doc_id: docId,
+      uid: userUid,
+      before_data: beforeData,
+      after_data: afterData,
       created_at: admin.firestore.FieldValue.serverTimestamp(),
     });
   });
