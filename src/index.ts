@@ -1,10 +1,22 @@
 import * as functions from "firebase-functions";
+import * as admin from "firebase-admin";
 
-exports.myFunction = functions.firestore
+admin.initializeApp();
+
+exports.onWriteTrigger = functions.firestore
   .document("restaurant_list/{docId}")
-  .onCreate((change, context) => {
-    const newValue = change.data();
-    const name = newValue.name;
-    console.log(name);
-    /* ... */
+  .onWrite(async (change, context) => {
+    const docId = context.params.docId;
+    const userUid = context.auth ? context.auth.uid : null;
+    const params = context.params;
+    const beforeData = change.before.data();
+    const afterData = change.after.data();
+
+    await admin.firestore().collection("logs").add({
+      docId,
+      userUid,
+      beforeData,
+      afterData,
+      created_at: admin.firestore.FieldValue.serverTimestamp(),
+    });
   });
