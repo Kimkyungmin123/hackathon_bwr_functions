@@ -1,19 +1,19 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-
+//import * as serviceAccount from "../hackathon-93422-firebase-adminsdk-m67l3-1e5b4b0d67.json";
 admin.initializeApp();
+const database = admin.firestore();
+//const auth = admin.auth();
 
 exports.onWriteTrigger = functions.firestore
-  .document("restaurant_list/{docId}")
+  .document("{collection}/{docId}")
   .onWrite(async (change, context) => {
     const docId = context.params.docId;
-    const userUid = context.auth ? context.auth.uid : null;
     const beforeData = change.before.data();
     const afterData = change.after.data();
 
-    await admin.firestore().collection("logs").add({
+    await database.collection("logs").add({
       doc_id: docId,
-      uid: userUid,
       before_data: beforeData,
       after_data: afterData,
       created_at: admin.firestore.FieldValue.serverTimestamp(),
